@@ -25,14 +25,16 @@
     <!-- State: Completed -->
     <template x-if="status === 'completed'">
       <div class="space-y-6 text-left">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-4 mb-4 border-gray-200 dark:border-gray-700 gap-4">
+        <div class="flex flex-col border-b pb-4 mb-4 border-gray-200 dark:border-gray-700 gap-4">
           <h2 class="text-2xl font-semibold text-green-600 dark:text-green-400 flex items-center gap-2">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             Расшифровка готова!
           </h2>
           <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <button type="button" @click="copyText()" class="btn btn-secondary text-sm w-full sm:w-auto" x-text="copied ? 'Скопировано ✓' : 'Копировать'"></button>
-            <a :href="`/download/${result.filename}`" class="btn btn-primary text-sm w-full sm:w-auto text-center">Скачать файл (.txt)</a>
+            <button type="button" @click="copyText(forAi())" class="btn btn-accent text-sm w-full sm:w-auto whitespace-nowrap" x-show="prompt" x-text="copied === 'ai' ? 'Скопировано ✓' : 'Копировать для ИИ'"
+              title="Шаблон протокола встречи + расшифровка с тайм-кодами — вставьте в Claude или ChatGPT"></button>
+            <button type="button" @click="copyText(result.text, 'text')" class="btn btn-secondary text-sm w-full sm:w-auto whitespace-nowrap" x-text="copied === 'text' ? 'Скопировано ✓' : 'Копировать'"></button>
+            <a :href="`/download/${result.filename}`" class="btn btn-primary text-sm w-full sm:w-auto text-center whitespace-nowrap">Скачать файл (.txt)</a>
           </div>
         </div>
         
@@ -60,6 +62,7 @@
   </div>
 </section>
 
+<script type="application/json" id="protocol-prompt">{{ protocol_prompt()|tojson }}</script>
 <script>
   function progressApp(taskId) {
     return {
@@ -69,26 +72,31 @@
       message: 'Подключение…',
       result: null,
       socket: null,
-      copied: false,
+      copied: null,
+      prompt: JSON.parse(document.getElementById('protocol-prompt').textContent),
 
       init() {
         this.connect();
       },
 
-      async copyText() {
+      forAi() {
+        return `${this.prompt}\n\n## ТРАНСКРИПТ\nКаждая строка начинается с тайм-кода [чч:мм:сс] от начала записи.\n\n${this.result.text}`;
+      },
+
+      async copyText(text, kind = 'ai') {
         try {
-          await navigator.clipboard.writeText(this.result.text);
+          await navigator.clipboard.writeText(text);
         } catch (e) {
           // Fallback for contexts where the Clipboard API is unavailable
           const ta = document.createElement('textarea');
-          ta.value = this.result.text;
+          ta.value = text;
           document.body.appendChild(ta);
           ta.select();
           document.execCommand('copy');
           ta.remove();
         }
-        this.copied = true;
-        setTimeout(() => this.copied = false, 2000);
+        this.copied = kind;
+        setTimeout(() => this.copied = null, 2000);
       },
       
       connect() {

@@ -57,8 +57,19 @@ def _check_ffmpeg_available() -> bool:
     return False
 
 
+def _timecode(seconds: float) -> str:
+    total = int(seconds)
+    return f"{total // 3600:02d}:{total % 3600 // 60:02d}:{total % 60:02d}"
+
+
+def _format_segments(segments: list[tuple[float, str]]) -> str:
+    """Одна строка на сегмент: «[чч:мм:сс] текст»."""
+    lines = [f"[{_timecode(start)}] {text.strip()}" for start, text in segments if text.strip()]
+    return "\n".join(lines)
+
+
 def transcribe_file(
-    media_path: Path, 
+    media_path: Path,
     model_name: str | None = None, 
     progress_callback: Optional[Callable[[int, str], None]] = None
 ) -> str:
@@ -145,6 +156,9 @@ def transcribe_file(
                 progress_callback(100, "Расшифровка готова!")
                 
             logger.info(f"backend=openai-whisper device={device} fp16={device == 'cuda'} model={model_name}")
+            segments = result.get("segments") or []
+            if segments:
+                return _format_segments([(s["start"], s["text"]) for s in segments])
             return result.get("text", "").strip()
         except Exception as e1:
             whisper_err = e1
@@ -181,14 +195,14 @@ def transcribe_file(
         text_parts = []
         
         for seg in segments:
-            text_parts.append(seg.text)
+            text_parts.append((seg.start, seg.text))
             if progress_callback and total_duration > 0:
                 # Progresso de 20% a 95%
                 current_percent = 20 + int((seg.end / total_duration) * 75)
                 current_percent = min(95, current_percent)
                 progress_callback(current_percent, f"Расшифровываю: {int(seg.end)} с из {int(total_duration)} с")
 
-        text = " ".join(t.strip() for t in text_parts).strip()
+        text = _format_segments(text_parts)
         
         if progress_callback:
             progress_callback(100, "Завершаю…")

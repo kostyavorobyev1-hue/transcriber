@@ -21,7 +21,10 @@ class TestTranscriber:
         
         mock_whisper = MagicMock()
         mock_model = MagicMock()
-        mock_model.transcribe.return_value = {"text": "Texto transcodificado"}
+        mock_model.transcribe.return_value = {
+            "text": "Texto transcodificado",
+            "segments": [{"start": 0.0, "text": " Texto"}, {"start": 3725.4, "text": " transcodificado"}],
+        }
         mock_whisper.load_model.return_value = mock_model
         
         # Mockar o módulo 'whisper' em sys.modules para que 'import whisper' funcione
@@ -32,7 +35,7 @@ class TestTranscriber:
             result = transcribe_file(Path("fake_audio.mp3"), model_name="base", progress_callback=callback)
         
         # Verificar
-        assert result == "Texto transcodificado"
+        assert result == "[00:00:00] Texto\n[01:02:05] transcodificado"
         mock_whisper.load_model.assert_called_once_with("base", device="cpu") # Assumes CPU in test env
         mock_model.transcribe.assert_called_once()
         # Verificar se callback foi chamado (pelo menos inicio e fim)
@@ -58,6 +61,7 @@ class TestTranscriber:
         # faster-whisper retorna (segments, info)
         Segment = MagicMock()
         Segment.text = "Texto faster"
+        Segment.start = 5.0
         Segment.end = 10.0
         
         Info = MagicMock()
@@ -72,7 +76,7 @@ class TestTranscriber:
             result = transcribe_file(Path("fake_audio.mp3"), model_name="small", progress_callback=callback)
         
         # Verificar
-        assert result == "Texto faster"
+        assert result == "[00:00:05] Texto faster"
         mock_check_ffmpeg.assert_called_once()
         # Verifica se tentou instanciar o modelo
         mock_model_cls.assert_called()
