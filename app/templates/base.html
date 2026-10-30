@@ -1,6 +1,6 @@
 <!doctype html>
 <!-- Set dark mode as default via class="dark" and initialize Alpine.js to respect it -->
-<html lang="en" class="dark" x-data="{ dark: localStorage.getItem('theme') !== 'light' }" x-init="$watch('dark', v => {localStorage.setItem('theme', v ? 'dark' : 'light'); document.documentElement.classList.toggle('dark', v)})">
+<html lang="ru" class="dark" x-data="{ dark: localStorage.getItem('theme') !== 'light' }" x-init="$watch('dark', v => {localStorage.setItem('theme', v ? 'dark' : 'light'); document.documentElement.classList.toggle('dark', v)})">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -74,10 +74,10 @@
       </a>
       <div class="flex items-center gap-4 sm:gap-6">
         <nav class="flex items-center gap-4 text-sm font-medium">
-          <a href="/library" class="hover:text-primary transition-colors">Library</a>
-          <a href="/history" class="hover:text-primary transition-colors">History</a>
+          <a href="/library" class="hover:text-primary transition-colors">Библиотека</a>
+          <a href="/history" class="hover:text-primary transition-colors">История</a>
         </nav>
-        <button class="p-2 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors" @click="dark = !dark" aria-label="Toggle Dark Mode">
+        <button class="p-2 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors" @click="dark = !dark" aria-label="Переключить тёмную тему">
           <!-- Sun Icon (shows when dark) -->
           <svg x-show="dark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
           <!-- Moon Icon (shows when light) -->
@@ -95,10 +95,10 @@
     <div class="max-w-6xl mx-auto px-4 py-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500 dark:text-gray-400">
       <div class="flex items-center gap-2">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-        <span>© {{ 2025 }} Transcriber | <a href="https://github.com/Br3n0k/transcriber" target="_blank" rel="noopener" class="font-medium text-primary hover:underline">Project Open Source</a></span>
+        <span>© {{ 2025 }} Transcriber | <a href="https://github.com/Br3n0k/transcriber" target="_blank" rel="noopener" class="font-medium text-primary hover:underline">Исходный код проекта</a></span>
       </div>
       <div>
-        Developed by <a href="https://github.com/Br3n0k" target="_blank" rel="noopener" class="font-medium text-primary hover:underline">Brendown Ferreira</a>
+        Автор: <a href="https://github.com/Br3n0k" target="_blank" rel="noopener" class="font-medium text-primary hover:underline">Brendown Ferreira</a>
       </div>
     </div>
   </footer>

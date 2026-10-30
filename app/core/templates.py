@@ -9,7 +9,7 @@ templates = Jinja2Templates(directory=str(settings.templates_dir))
 # Register Filters
 def timestamp_to_date(timestamp: float) -> str:
     try:
-        return datetime.fromtimestamp(timestamp).strftime('%d/%m/%Y %H:%M')
+        return datetime.fromtimestamp(timestamp).strftime('%d.%m.%Y %H:%M')
     except Exception:
         return ""
 

@@ -4,12 +4,12 @@
 <div class="max-w-6xl mx-auto px-4 py-8 sm:py-12">
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end mb-8 gap-4">
         <div>
-            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">File Library</h2>
-            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Manage and organize your generated transcriptions and source audio files.</p>
+            <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Библиотека файлов</h2>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Готовые расшифровки и исходные аудиофайлы.</p>
         </div>
         <div class="flex items-center gap-2">
             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary dark:bg-primary/20">
-                {{ items|length }} Items
+                Записей: {{ items|length }}
             </span>
         </div>
     </div>
@@ -24,7 +24,7 @@
                     
                     <!-- Transcription -->
                     <div>
-                        <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Transcription</span>
+                        <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Расшифровка</span>
                         {% if item.transcription %}
                         <div class="flex items-start gap-3">
                             <div class="p-2.5 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl shrink-0 group-hover:scale-110 transition-transform duration-300">
@@ -32,20 +32,20 @@
                             </div>
                             <div class="min-w-0">
                                 <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate" title="{{ item.transcription }}">{{ item.transcription }}</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">{{ (item.size / 1024)|round(1) }} KB</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">{{ (item.size / 1024)|round(1) }} КБ</p>
                             </div>
                         </div>
                         {% else %}
                         <div class="flex items-center gap-2 text-gray-400 dark:text-gray-500">
                             <svg class="w-5 h-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
-                            <span class="text-sm italic">No transcription</span>
+                            <span class="text-sm italic">Расшифровки нет</span>
                         </div>
                         {% endif %}
                     </div>
 
                     <!-- Audio Source -->
                     <div>
-                        <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Audio Source</span>
+                        <span class="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Исходное аудио</span>
                         {% if item.audio %}
                         <div class="flex items-start gap-3">
                             <div class="p-2.5 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-xl shrink-0 group-hover:scale-110 transition-transform duration-300">
@@ -53,13 +53,13 @@
                             </div>
                             <div class="min-w-0">
                                 <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate" title="{{ item.audio }}">{{ item.audio }}</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">Original File</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">Оригинал</p>
                             </div>
                         </div>
                         {% else %}
                         <div class="flex items-center gap-2 text-gray-400 dark:text-gray-500">
                             <svg class="w-5 h-5 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                            <span class="text-sm italic">Audio removed</span>
+                            <span class="text-sm italic">Аудио удалено</span>
                         </div>
                         {% endif %}
                     </div>
@@ -74,15 +74,15 @@
                     
                     <div class="flex items-center gap-2">
                         {% if item.transcription %}
-                        <a href="/download/{{ item.transcription }}" class="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 dark:text-gray-400 dark:hover:text-indigo-400 dark:hover:bg-indigo-900/20 rounded-xl transition-all duration-200" title="Download Transcription">
+                        <a href="/download/{{ item.transcription }}" class="p-2 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 dark:text-gray-400 dark:hover:text-indigo-400 dark:hover:bg-indigo-900/20 rounded-xl transition-all duration-200" title="Скачать расшифровку">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                         </a>
                         {% endif %}
                         
-                        <form action="/library/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete this item? This action will remove both the transcription and associated audio.');" class="m-0">
+                        <form action="/library/delete" method="POST" onsubmit="return confirm('Удалить запись? Будут удалены и расшифровка, и связанное с ней аудио.');" class="m-0">
                             <input type="hidden" name="transcription_path" value="{{ item.transcription_path or '' }}">
                             <input type="hidden" name="audio_path" value="{{ item.audio_path or '' }}">
-                            <button type="submit" class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-red-900/20 rounded-xl transition-all duration-200" title="Delete">
+                            <button type="submit" class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-red-900/20 rounded-xl transition-all duration-200" title="Удалить">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                             </button>
                         </form>
@@ -98,9 +98,9 @@
             <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 mb-4 text-gray-400 dark:text-gray-500">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"></path></svg>
             </div>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Library is empty</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">You haven't generated any transcriptions yet. Once you transcribe an audio or video, it will appear here.</p>
-            <a href="/" class="btn btn-primary shadow-lg shadow-primary/30">Start Transcribing</a>
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1">Библиотека пуста</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-md mx-auto">Расшифровок пока нет. Когда вы расшифруете аудио или видео, оно появится здесь.</p>
+            <a href="/" class="btn btn-primary shadow-lg shadow-primary/30">Начать расшифровку</a>
         </div>
         {% endif %}
     </div>

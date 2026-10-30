@@ -68,4 +68,4 @@ def download_from_youtube(url: str, audio_only: bool = True) -> Path:
             
     except Exception as e:
         logger.exception(f"Erro ao baixar do YouTube: {e}")
-        raise RuntimeError(f"Falha ao baixar do YouTube: {e}") from e
+        raise RuntimeError(f"Не удалось скачать с YouTube: {e}") from e

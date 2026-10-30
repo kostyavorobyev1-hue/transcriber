@@ -15,7 +15,7 @@ class ProgressManager:
         self.tasks[task_id] = {
             "status": "pending",
             "progress": 0,
-            "message": "Iniciando...",
+            "message": "Запуск…",
             "result": None
         }
         logger.info(f"Tarefa criada: {task_id}")
@@ -34,14 +34,14 @@ class ProgressManager:
         if task_id in self.tasks:
             self.tasks[task_id]["status"] = "completed"
             self.tasks[task_id]["progress"] = 100
-            self.tasks[task_id]["message"] = "Concluído!"
+            self.tasks[task_id]["message"] = "Готово!"
             self.tasks[task_id]["result"] = result
             await self.notify_client(task_id)
 
     async def fail_task(self, task_id: str, error: str):
         if task_id in self.tasks:
             self.tasks[task_id]["status"] = "failed"
-            self.tasks[task_id]["message"] = f"Erro: {error}"
+            self.tasks[task_id]["message"] = f"Ошибка: {error}"
             await self.notify_client(task_id)
 
     async def connect(self, task_id: str, websocket: Any):
