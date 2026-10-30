@@ -3,10 +3,12 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
-
 # Define o caminho base do projeto para a raiz subindo dois níveis
 BASE_DIR = Path(__file__).resolve().parents[2]
+
+# .env.local — локальные секреты (ключи API), не хранится в git; загружается первым, поэтому важнее .env
+load_dotenv(BASE_DIR / ".env.local")
+load_dotenv()
 
 
 class Settings(BaseModel):
@@ -22,6 +24,12 @@ class Settings(BaseModel):
     whisper_model_default: str = os.getenv("WHISPER_MODEL", "base")
     # Transcription Device: 'auto' (prefer GPU), 'cuda' (force GPU), 'cpu' (force CPU)
     transcription_device: str = os.getenv("TRANSCRIPTION_DEVICE", "auto").lower()
+
+    # Gemini (протокол встречи по шаблону): модели пробуются по порядку, следующая — если предыдущая перегружена
+    gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
+    gemini_models: list[str] = [
+        m.strip() for m in os.getenv("GEMINI_MODELS", "gemini-3.6-flash,gemini-3.1-flash-lite").split(",") if m.strip()
+    ]
 
 
 settings = Settings()

@@ -8,13 +8,34 @@ app = FastAPI(title=settings.app_name, debug=settings.debug)
 # Mount static files
 app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")
 
+import asyncio  # noqa: E402
+from pathlib import Path  # noqa: E402
+from fastapi import HTTPException  # noqa: E402
 from fastapi.responses import FileResponse  # noqa: E402
+from .services.summarizer import summarize, SummaryError  # noqa: E402
 
 
 @app.get("/download/{filename}")
 async def download(filename: str):
     file_path = settings.storage_transcriptions / filename
     return FileResponse(path=str(file_path), filename=filename, media_type="text/plain")
+
+
+@app.post("/protocol/{filename}")
+async def protocol(filename: str):
+    """Протокол встречи по шаблону (Gemini) для готовой расшифровки; сохраняется рядом как <имя>_protocol.md."""
+    source = settings.storage_transcriptions / filename
+    if Path(filename).name != filename or source.suffix != ".txt" or not source.is_file():
+        raise HTTPException(status_code=404, detail="Расшифровка не найдена")
+
+    try:
+        text = await asyncio.to_thread(summarize, source.read_text(encoding="utf-8"))
+    except SummaryError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+
+    out_name = f"{source.stem}_protocol.md"
+    (settings.storage_transcriptions / out_name).write_text(text + "\n", encoding="utf-8")
+    return FileResponse(path=str(settings.storage_transcriptions / out_name), filename=out_name, media_type="text/markdown")
 
 # Include routers (to be implemented)
 from .routers import home, upload, history, websocket, library  # noqa: E402

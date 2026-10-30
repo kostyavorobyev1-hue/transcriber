@@ -30,12 +30,20 @@
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             Расшифровка готова!
           </h2>
-          <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full sm:w-auto">
+            <button type="button" @click="downloadProtocol()" :disabled="protocolLoading"
+              class="btn btn-primary text-sm w-full sm:w-auto whitespace-nowrap disabled:opacity-70 disabled:cursor-wait"
+              title="Gemini составит протокол встречи по шаблону и скачает его в .md">
+              <svg x-show="protocolLoading" class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+              <span x-text="protocolLoading ? 'Составляю протокол…' : 'Скачать протокол (.md)'"></span>
+            </button>
             <button type="button" @click="copyText(forAi())" class="btn btn-accent text-sm w-full sm:w-auto whitespace-nowrap" x-show="prompt" x-text="copied === 'ai' ? 'Скопировано ✓' : 'Копировать для ИИ'"
               title="Шаблон протокола встречи + расшифровка с тайм-кодами — вставьте в Claude или ChatGPT"></button>
             <button type="button" @click="copyText(result.text, 'text')" class="btn btn-secondary text-sm w-full sm:w-auto whitespace-nowrap" x-text="copied === 'text' ? 'Скопировано ✓' : 'Копировать'"></button>
-            <a :href="`/download/${result.filename}`" class="btn btn-primary text-sm w-full sm:w-auto text-center whitespace-nowrap">Скачать файл (.txt)</a>
+            <a :href="`/download/${result.filename}`" class="btn bg-gray-600 hover:bg-gray-500 text-sm w-full sm:w-auto text-center whitespace-nowrap">Скачать расшифровку (.txt)</a>
           </div>
+          <p x-show="protocolLoading" class="text-sm text-gray-500 dark:text-gray-400">Обычно это занимает до минуты, для длинных встреч — дольше.</p>
+          <p x-show="protocolError" class="text-sm text-red-600 dark:text-red-400" x-text="protocolError"></p>
         </div>
         
         <div class="bg-gray-50 dark:bg-gray-900 p-4 sm:p-6 rounded-xl border border-gray-200 dark:border-gray-700 font-mono text-sm whitespace-pre-wrap max-h-[60vh] overflow-y-auto text-gray-800 dark:text-gray-300"
@@ -77,6 +85,32 @@
 
       init() {
         this.connect();
+      },
+
+      protocolLoading: false,
+      protocolError: '',
+
+      async downloadProtocol() {
+        this.protocolLoading = true;
+        this.protocolError = '';
+        try {
+          const resp = await fetch(`/protocol/${encodeURIComponent(this.result.filename)}`, { method: 'POST' });
+          if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            throw new Error(err.detail || `Ошибка ${resp.status}`);
+          }
+          const name = this.result.filename.replace(/\.txt$/, '') + '_protocol.md';
+          const url = URL.createObjectURL(await resp.blob());
+          const a = Object.assign(document.createElement('a'), { href: url, download: name });
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+        } catch (e) {
+          this.protocolError = `Не удалось составить протокол: ${e.message}`;
+        } finally {
+          this.protocolLoading = false;
+        }
       },
 
       forAi() {
