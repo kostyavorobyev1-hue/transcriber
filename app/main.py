@@ -3,12 +3,14 @@ import logging
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from .core.config import settings
+from .core.security import LocalOnlyMiddleware
 from .core.templates import templates  # Importa templates configurados
 
 # Без этого INFO-сообщения приложения (не uvicorn) не попадают в лог
 logging.basicConfig(level=logging.INFO, format="%(levelname)s:     %(name)s: %(message)s")
 
 app = FastAPI(title=settings.app_name, debug=settings.debug)
+app.add_middleware(LocalOnlyMiddleware)
 
 # Mount static files
 app.mount("/static", StaticFiles(directory=settings.static_dir), name="static")

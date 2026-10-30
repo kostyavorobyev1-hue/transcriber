@@ -4,7 +4,7 @@ from app.core.config import settings
 from pathlib import Path
 import shutil
 
-client = TestClient(app)
+client = TestClient(app, base_url="http://127.0.0.1")
 
 def test_library_page_render():
     # Setup: Create some dummy files to ensure the template has data to render
