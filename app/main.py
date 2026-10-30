@@ -23,7 +23,10 @@ async def download(filename: str):
 
 @app.post("/protocol/{filename}")
 async def protocol(filename: str):
-    """Протокол встречи по шаблону (Gemini) для готовой расшифровки; сохраняется рядом как <имя>_protocol.md."""
+    """Протокол встречи по шаблону (Gemini) для готовой расшифровки; сохраняется в protocols/<имя>_protocol.txt.
+
+    Отдельная папка — чтобы протокол не попадал в историю и библиотеку как ещё одна расшифровка (.txt).
+    """
     source = settings.storage_transcriptions / filename
     if Path(filename).name != filename or source.suffix != ".txt" or not source.is_file():
         raise HTTPException(status_code=404, detail="Расшифровка не найдена")
@@ -33,9 +36,11 @@ async def protocol(filename: str):
     except SummaryError as e:
         raise HTTPException(status_code=502, detail=str(e))
 
-    out_name = f"{source.stem}_protocol.md"
-    (settings.storage_transcriptions / out_name).write_text(text + "\n", encoding="utf-8")
-    return FileResponse(path=str(settings.storage_transcriptions / out_name), filename=out_name, media_type="text/markdown")
+    out_dir = settings.storage_transcriptions / "protocols"
+    out_dir.mkdir(exist_ok=True)
+    out_path = out_dir / f"{source.stem}_protocol.txt"
+    out_path.write_text(text + "\n", encoding="utf-8")
+    return FileResponse(path=str(out_path), filename=out_path.name, media_type="text/plain; charset=utf-8")
 
 # Include routers (to be implemented)
 from .routers import home, upload, history, websocket, library  # noqa: E402
