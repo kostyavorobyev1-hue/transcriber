@@ -45,7 +45,7 @@ async def process_transcription(task_id: str, media_path: Path, original_filenam
             logger.warning(f"Erro na limpeza: {e}")
 
         # Atualizar status final
-        await progress_manager.complete_task(task_id, {"filename": out_path.name, "text": text[:200] + "..."})
+        await progress_manager.complete_task(task_id, {"filename": out_path.name, "text": text})
 
     except Exception as e:
         logger.exception(f"Erro na tarefa {task_id}")

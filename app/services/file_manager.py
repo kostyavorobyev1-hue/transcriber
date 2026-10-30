@@ -7,11 +7,27 @@ import re
 from ..core.config import settings
 
 
+_CYRILLIC = {
+    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e', 'ж': 'zh',
+    'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o',
+    'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'kh', 'ц': 'ts',
+    'ч': 'ch', 'ш': 'sh', 'щ': 'shch', 'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu',
+    'я': 'ya',
+}
+_TRANSLIT = str.maketrans({
+    **_CYRILLIC,
+    **{k.upper(): v.capitalize() for k, v in _CYRILLIC.items()},
+})
+
+
 def sanitize_filename(filename: str) -> str:
     """
-    Sanitize the filename by removing accents, replacing spaces with underscores,
-    and removing non-alphanumeric characters (except dots and hyphens).
+    Sanitize the filename by transliterating Cyrillic, removing accents, replacing
+    spaces with underscores, and removing non-alphanumeric characters (except dots and hyphens).
     """
+    # Transliterate Cyrillic first, otherwise it is dropped as non-ASCII below
+    # (and NFKD would turn "й" into "и" + breve)
+    filename = filename.translate(_TRANSLIT)
     # Normalize unicode characters to decompose combined characters (like accents)
     nfkd_form = unicodedata.normalize('NFKD', filename)
     # Filter out non-ASCII characters (removes accents)
