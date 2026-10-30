@@ -31,6 +31,10 @@ class Settings(BaseModel):
         m.strip() for m in os.getenv("GEMINI_MODELS", "gemini-3.6-flash,gemini-3.1-flash-lite").split(",") if m.strip()
     ]
 
+    # Автообработка записей Телемоста: новые файлы в папке → расшифровка + протокол в <папка>/Протоколы
+    telemost_watch: bool = os.getenv("TELEMOST_WATCH", "true").lower() == "true"
+    telemost_dir: Path = Path(os.getenv("TELEMOST_DIR", str(Path.home() / "Documents" / "Телемост")))
+
 
 settings = Settings()
 

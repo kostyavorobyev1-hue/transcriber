@@ -159,6 +159,12 @@ docker run --rm --gpus all -p 8000:8000 transcriber
 * `POST /transcribe/upload` → Start File job
 * `WS /ws/progress/{task_id}` → Real-time status stream
 
+**Автообработка записей Телемоста (macOS):**
+
+Сервис раз в минуту смотрит в `~/Documents/Телемост` (`TELEMOST_DIR`, выключить — `TELEMOST_WATCH=false`). Новая запись берётся в работу, когда перестала расти; расшифровка и протокол кладутся в `<папка>/Протоколы`, расшифровка видна и в истории. Записи, лежавшие в папке при первом запуске, пропускаются (`storage/telemost_state.json`).
+
+`~/Documents` защищена macOS: фоновому сервису нужен «Полный доступ к диску» для `Python.app` (`…/Python3.framework/Versions/3.9/Resources/Python.app`). Чтобы macOS сопоставила разрешение, launchd должен запускать сам `Python.app/Contents/MacOS/Python`, а venv передаётся через `__PYVENV_LAUNCHER__=<проект>/.venv/bin/python`.
+
 ---
 
 ## 🧪 Testing

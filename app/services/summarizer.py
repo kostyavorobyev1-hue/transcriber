@@ -1,5 +1,6 @@
 from __future__ import annotations
 import logging
+from pathlib import Path
 
 import requests
 
@@ -79,3 +80,16 @@ def summarize(transcript: str) -> str:
         return text
 
     raise SummaryError("Gemini сейчас недоступен, попробуйте позже. " + "; ".join(errors))
+
+
+def write_protocol(transcript_path: Path) -> Path:
+    """Протокол по расшифровке → protocols/<имя>_protocol.txt.
+
+    Отдельная папка — чтобы протокол не попадал в историю и библиотеку как ещё одна расшифровка (.txt).
+    """
+    text = summarize(transcript_path.read_text(encoding="utf-8"))
+    out_dir = settings.storage_transcriptions / "protocols"
+    out_dir.mkdir(exist_ok=True)
+    out_path = out_dir / f"{transcript_path.stem}_protocol.txt"
+    out_path.write_text(text + "\n", encoding="utf-8")
+    return out_path
